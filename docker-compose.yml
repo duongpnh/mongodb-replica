@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  mongodb-primary:
+    image: mongo:5
+    ports:
+      - 27017:27017
+    container_name: mongodb-primary
+    command: mongod --replSet "rs0"
+    volumes:
+      - ./mongodb/primary:/data/db
+    environment:
+      - MONGO_INITDB_REPLICASET=rs0
+    restart: always
+    networks:
+      - mongo_replica
+
+  mongodb-secondary:
+    image: mongo:5
+    ports:
+      - 30001:27017
+    container_name: mongodb-secondary
+    command: mongod --replSet "rs0"
+    volumes:
+      - ./mongodb/secondary:/data/db
+    environment:
+      - MONGO_INITDB_REPLICASET=rs0
+    restart: always
+    networks:
+      - mongo_replica
+
+  mongodb-arbiter:
+    image: mongo:5
+    ports:
+      - 30002:27017
+    container_name: mongodb-arbiter
+    command: mongod --replSet "rs0"
+    volumes:
+      - ./mongodb/arbiter:/data/db
+    environment:
+      - MONGO_INITDB_REPLICASET=rs0
+    restart: always
+    networks:
+      - mongo_replica
+
+volumes:
+  mongodb-primary:
+  mongodb-secondary:
+  mongodb-arbiter:
+
+networks:
+  mongo_replica:
+    driver: bridge
